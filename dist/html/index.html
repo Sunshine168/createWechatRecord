@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>canvas仿微信</title>
+</head>
+<style>
+	 #canvas { border: 1px solid #aaaaaa; display: inline-block; margin: 50px auto; }
+	 .operation{
+	 	display: inline-block;
+	 	vertical-align: top;
+	 	padding-top: 100px;
+	 }
+	 .avatar-item{
+	 	/*display: inline-block;*/
+	 }
+.spinner {
+  position: relative;
+  transform: translate(50%,50%);
+  left:50;
+  top:50;
+  margin: 100px auto;
+  width: 50px;
+  height: 300px;
+  text-align: center;
+  font-size: 10px;
+}
+ 
+.spinner > div {
+  background-color: #67CF22;
+  height: 100%;
+  width: 6px;
+  display: inline-block;
+   
+  -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+  animation: stretchdelay 1.2s infinite ease-in-out;
+}
+ 
+.spinner .rect2 {
+  -webkit-animation-delay: -1.1s;
+  animation-delay: -1.1s;
+}
+ 
+.spinner .rect3 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+ 
+.spinner .rect4 {
+  -webkit-animation-delay: -0.9s;
+  animation-delay: -0.9s;
+}
+ 
+.spinner .rect5 {
+  -webkit-animation-delay: -0.8s;
+  animation-delay: -0.8s;
+}
+ 
+@-webkit-keyframes stretchdelay {
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) } 
+  20% { -webkit-transform: scaleY(1.0) }
+}
+ 
+@keyframes stretchdelay {
+  0%, 40%, 100% {
+    transform: scaleY(0.4);
+    -webkit-transform: scaleY(0.4);
+  }  20% {
+    transform: scaleY(1.0);
+    -webkit-transform: scaleY(1.0);
+  }
+}
+#loading{
+	top: 0;
+	left: 0;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	z-index: 100;
+}
+.confirm-avatar{
+	padding-top: 50px;
+	display: block;
+}
+.talk{
+	padding-top: 50px;
+}
+</style>
+<body>
+	<div id="canvas-warp">
+    <canvas id="canvas">
+        你的浏览器居然不支持Canvas？！赶快换一个吧！！
+    </canvas>
+    <div class="operation">
+    <div>
+    	 <select name="mode" id="mode" value="0">
+    	 	<option value="0">普通双人</option>
+    	 	<option value="1">个性独白</option>
+    	 	<option value="1">对方独白</option>
+    	 </select>
+    </div>
+    <div class="avatar">
+      <h4>上传头像</h4> <input type="text" id="talkerName">  <input type="button" value="输入名字" onclick="setName()" id="setName">
+   	  <div class="avatar-item">
+   	     <h5>本人头像</h5>
+   	  	 <input type="file" id="avatar"> 
+         <input type="button" value="清除图片" id="add">
+   	  </div>
+   	    <div class="avatar-item">
+   	    <h5>聊天者头像</h5>
+   	  	 <input type="file" id="avatar2">
+         <input type="button" value="清除图片" id="add">
+   	  </div>
+   	  <span class="confirm-avatar"><input type="button" value="确定图片" id="upload"></span>
+   </div>
+   <div class="talk">
+   	   <select name="" id="talkerType">
+   	   	 <option value="0">自己</option>
+    	 	<option value="1">对方</option>
+   	   </select>
+   	   <input type="text" id="message" value="">
+   	   <input type="button" value="添加信息" id="addMessage" disabled onclick="addMessage()">
+   </div>
+    </div>
+<div id="loading">
+<div class="spinner">
+  <div class="rect1"></div>
+  <div class="rect2"></div>
+  <div class="rect3"></div>
+  <div class="rect4"></div>
+  <div class="rect5"></div>
+</div>
+</div>
+</div>
+<script src="../js/index.js"></script>
+<script>
+       var canvas,context,drawWecheatView,isInit,avatar,list = [
+       {
+       	user:0,
+       	message:"hello"
+       },
+        {
+       	user:1,
+       	message:"hello1"
+       },
+        {
+       	user:1,
+       	message:"hello2"
+       },
+       ]
+         canvas = document.getElementById("canvas");
+        canvas.width = 500;
+        canvas.height = 800;
+        context = canvas.getContext("2d");
+        drawWecheatView = new DrawWecheatView({
+		mode:0,
+		platform:0,
+		x:0,
+		y:0,
+		context:context,
+		windowWidth:500,
+		windowHeight:800
+	})  
+        document.getElementById("upload").onclick = function(){
+        	 console.log("error");
+          	 var avatar = document.getElementById('avatar'),
+	    	     avatar2 = document.getElementById('avatar2'),
+	    	     mode    = document.getElementById('mode').value,
+	    	     addMessage = document.getElementById('addMessage');
+	    	     mode = Number(mode);
+	    	     if(mode==0){
+	    	     	//双方头像必须上传
+	    	     	if(!avatar.files[0]||!avatar2.files[0]){
+	    	     		alert("请上传双方头像");
+	    	     	}else{
+	    	     		this.disabled =true
+	    	     		uploadAvatarBoth(avatar,avatar2).then(function(){
+                              addMessage.disabled = false;
+	    	     		})
+	    	     	}
+	    	     }
+	    	     if(mode==1){
+	    	        //自己头像必须上传
+	    	        if(!avatar.files[0]){
+	    	     		alert("请上传自己头像")
+	    	     	}else{
+	    	     		this.disabled =true
+	    	     		uploadAvatarSelf(avatar).then(function(result){
+                              addMessage.disabled = false;
+	    	     		})
+	    	     	}
+	    	     }
+	    	      if(mode==2){
+	    	        //对方头像必须上传
+	    	         if(!avatar2.files[0]){
+	    	     		alert("请上传对方头像")
+	    	     	}else{
+	    	     		this.disabled =true
+	    	     		uploadAvatarSelf(avatar2).then(function(){
+                              addMessage.disabled = false;
+	    	     		})
+	    	     	}
+	    	     }
+
+        }
+	    checkInit(function(){
+	    	document.getElementById('loading').style.display="none";
+	    }) 
+	    drawWecheatView.initView()
+	    .then(function(){
+	    	isInit =  true;
+	    	return drawWecheatView.setBarkground({color:"#f3f3f3"})
+	    })
+	    function checkInit(success,fail){
+	    	var timer = setInterval(function(){
+                    if(isInit){
+                    	clearInterval(timer);
+                    	clearInterval(timeOuter);
+                    	console.log("初始化成功")//
+                    	success()
+                    }
+	    	},500);
+	    	var timeOuter = setTimeout(function(){
+	    		    if(!isInit){
+	    		    	alert("初始化失败")
+	    		    }
+	    	},50000);
+	    }
+	    function uploadAvatarBoth(avatar,avatar2){
+	    	     	var p1 = drawWecheatView.setAvatar(0,avatar.files[0])
+	    	     	var p2 = drawWecheatView.setAvatar(1,avatar2.files[0])
+	    	     return Promise.all([p1,p2]);
+
+	    }
+	    function uploadAvatarSelf(avatar){
+	    	return drawWecheatView.setAvatar(0,avatar.files[0])
+	    }
+	    function uploadAvatarOther(avatar){
+	    	return drawWecheatView.setAvatar(1,avatar.files[0])
+	    }
+	    function addMessage(){
+	    	 var talkerType =  document.getElementById('talkerType').value,
+	    	     message =  document.getElementById('message').value;
+	    	     talkerType = Number(talkerType);
+	    	     if(message===""){
+	    	     	alert("信息不能为空")
+	    	     }else{
+	    	     	drawWecheatView.drewMessage(talkerType,message)
+	    	     }
+	    }
+	    function setName(){
+            var name = document.getElementById("talkerName").value;
+            drawWecheatView.setTalkerName(name);
+            document.getElementById("setName").disabled = true;
+	    }
+</script>
+</body>
+</html>
