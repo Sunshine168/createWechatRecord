@@ -192,10 +192,10 @@ var DrawWecheatView = (function () {
     DrawWecheatView.prototype.drewMessage = function (user, text) {
         //单行信息长度根据字体宽度设定,多行信息待定
         var avatarX, avatarY, messageX, messageY, width, height = 35, messageWidth = 100, messageHeight = 30, padding = 5, textCount = 0, row = 0, textSize;
-        var MULTIPE_LINE_CHAT_LIMIT = 36;
+        var MULTIPE_LINE_CHAT_LIMIT = 40, 
         //计算信息的宽度,先将中文转化一下,一个中文字符占位两个英文字符
-        var chineseCount = this._countChinese(text), textCount = text.length - chineseCount + chineseCount * 2, otherCount = text.length - chineseCount;
-        this.context.font = "20px 微软雅黑";
+        let = chineseCount = this._countChinese(text), textCount = text.length - chineseCount + chineseCount * 2, otherCount = text.length - chineseCount;
+        this.context.font = "18px 微软雅黑";
         if (textCount < MULTIPE_LINE_CHAT_LIMIT) {
             //只有一行
             width = this.context.measureText(text).width + 12;
