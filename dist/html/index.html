@@ -85,7 +85,7 @@
 	padding-top: 50px;
 	display: block;
 }
-.talk{
+.talk,.download{
 	padding-top: 50px;
 }
 </style>
@@ -124,6 +124,9 @@
    	   <input type="text" id="message" value="" class="message_input">
    	   <input type="button" value="添加信息" id="addMessage" disabled onclick="addMessage()">
    </div>
+   <div class="download">
+   	  <input type="button" id="process" value="下载图片" onclick="download()">
+   </div>
     </div>
 <div id="loading">
 <div class="spinner">
@@ -136,6 +139,7 @@
 </div>
 </div>
 <script src="../js/index.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/javascript-canvas-to-blob/3.8.0/js/canvas-to-blob.min.js"></script>
 <script>
        var canvas,context,drawWecheatView,isInit,avatar,list = [
        {
@@ -258,6 +262,30 @@
             drawWecheatView.setTalkerName(name);
             document.getElementById("setName").disabled = true;
 	    }
+	    function download(){
+	    	if (canvas.toBlob) {
+                canvas.toBlob(
+        function (blob) {
+           createAndDownloadFile("record.png",blob)
+        },
+        'image/jpeg'
+    );
+	    }
+	}
+/**
+https://gaohaoyang.github.io/2016/11/22/js-create-file-and-download/
+ * 创建并下载文件
+ * @param  {String} fileName 文件名
+ * @param  {String} content  文件内容
+ */
+function createAndDownloadFile(fileName, content) {
+    var aTag = document.createElement('a');
+    var blob = new Blob([content]);
+    aTag.download = fileName;
+    aTag.href = URL.createObjectURL(blob);
+    aTag.click();
+    URL.revokeObjectURL(blob);
+}
 </script>
 </body>
 </html>

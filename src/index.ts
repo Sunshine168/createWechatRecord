@@ -127,7 +127,7 @@ class DrawWecheatView{
         //初始化的时候已经将与头部的间距设为20
         this.realHeight = 20 + defaultInitViewOptions.talkerHeight + defaultInitViewOptions.statusHeight;
         this.backgroundHeight = 0;
-        this.avatarSize = 50;
+        this.avatarSize = 40;
         this.textSize = opts.textSize||11;
 	}
 	/*
@@ -243,10 +243,11 @@ class DrawWecheatView{
     		},500) 
     	})
     }
+    /*头像方面待更新*/
     /*绘制单条信息*/
     drewMessage(user:number,text:string){
     	//单行信息长度根据字体宽度设定,多行信息待定
-    	let avatarX:number,avatarY:number,messageX:number,messageY:number,width:number,height=40,
+    	let avatarX:number,avatarY:number,messageX:number,messageY:number,width:number,height=35,
     	 messageWidth = 100,messageHeight = 30,padding = 5,textCount =0,row=0,textSize;
     	 const MULTIPE_LINE_CHAT_LIMIT = 36;
     	  //计算信息的宽度,先将中文转化一下,一个中文字符占位两个英文字符
@@ -256,7 +257,7 @@ class DrawWecheatView{
     	      this.context.font = "20px 微软雅黑";
     	   if(textCount < MULTIPE_LINE_CHAT_LIMIT){
             //只有一行
-            width = this.context.measureText(text).width + 10;
+            width = this.context.measureText(text).width + 12;
           }else{
           	/*
           	多行定宽处理
@@ -274,7 +275,6 @@ class DrawWecheatView{
                     //第二个条件应该是通过计算非中文字符宽度和中文字符宽度比进行判断 这个暂时写死。。
                     if(strCount + strSize > MULTIPE_LINE_CHAT_LIMIT || this._countNotChinese(tempStr) > MULTIPE_LINE_CHAT_LIMIT - 3){
                     	  textRows[j].push(tempStr);
-                    	  console.log(`row ${j} is ${tempStr}`)
                     	  tempStr = "";
                     	  //换行
                           j++;
@@ -292,7 +292,6 @@ class DrawWecheatView{
             	textRows[temp].push(tempStr);
             	
             }
-            console.log(`row is ${j}`)
             height = 15 + (j+1) *20;
             width  = 18 * 20 + 15;     
   
@@ -317,7 +316,7 @@ class DrawWecheatView{
               this.context.fill();
               this.context.beginPath();
               //右边起点
-              this.context.moveTo(messageX+10+width,messageY+25)
+              this.context.moveTo(messageX+10+width,messageY+20)
               // 左上角
               this.context.lineTo(messageX+width,messageY+15)
               // //左下角
@@ -331,10 +330,10 @@ class DrawWecheatView{
           if(textCount < MULTIPE_LINE_CHAT_LIMIT){
             //单行绘制
             this.context.fillStyle = "#000"
-            this.context.fillText(text,messageX+6,messageY+35);
+            this.context.fillText(text,messageX+6,messageY + 30);
           }else{
            //多行绘制
-            let textRowX =messageX+10,textRowY=messageY+35;
+            let textRowX =messageX+10,textRowY=messageY + 30;
          for(let i =0;i < textRows.length;i++){
             //多行需要分拆
             this.context.beginPath(); 
@@ -360,7 +359,7 @@ class DrawWecheatView{
               this.context.fill();
               this.context.beginPath();
               //左边起点
-              this.context.moveTo(messageX-10,messageY+25)
+              this.context.moveTo(messageX-10,messageY+20)
               //右上角
               this.context.lineTo(messageX,messageY+15)
               //右下角
@@ -375,10 +374,10 @@ class DrawWecheatView{
           if(textCount<36){
             //单行绘制
             this.context.fillStyle = "#000"
-            this.context.fillText(text,messageX+6,messageY+35);
+            this.context.fillText(text,messageX+6,messageY + 30);
           }else{
            //多行绘制
-          let textRowX =messageX+10,textRowY=messageY+35;
+          let textRowX =messageX+10,textRowY=messageY + 30;
          for(let i =0;i < textRows.length;i++){
             //多行需要分拆
             this.context.beginPath(); 

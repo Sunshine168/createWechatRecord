@@ -78,7 +78,7 @@ var DrawWecheatView = (function () {
         //初始化的时候已经将与头部的间距设为20
         this.realHeight = 20 + defaultInitViewOptions.talkerHeight + defaultInitViewOptions.statusHeight;
         this.backgroundHeight = 0;
-        this.avatarSize = 50;
+        this.avatarSize = 40;
         this.textSize = opts.textSize || 11;
     }
     /*
@@ -187,17 +187,18 @@ var DrawWecheatView = (function () {
             }, 500);
         });
     };
+    /*头像方面待更新*/
     /*绘制单条信息*/
     DrawWecheatView.prototype.drewMessage = function (user, text) {
         //单行信息长度根据字体宽度设定,多行信息待定
-        var avatarX, avatarY, messageX, messageY, width, height = 40, messageWidth = 100, messageHeight = 30, padding = 5, textCount = 0, row = 0, textSize;
+        var avatarX, avatarY, messageX, messageY, width, height = 35, messageWidth = 100, messageHeight = 30, padding = 5, textCount = 0, row = 0, textSize;
         var MULTIPE_LINE_CHAT_LIMIT = 36;
         //计算信息的宽度,先将中文转化一下,一个中文字符占位两个英文字符
         var chineseCount = this._countChinese(text), textCount = text.length - chineseCount + chineseCount * 2, otherCount = text.length - chineseCount;
         this.context.font = "20px 微软雅黑";
         if (textCount < MULTIPE_LINE_CHAT_LIMIT) {
             //只有一行
-            width = this.context.measureText(text).width + 10;
+            width = this.context.measureText(text).width + 12;
         }
         else {
             /*
@@ -216,7 +217,6 @@ var DrawWecheatView = (function () {
                 //第二个条件应该是通过计算非中文字符宽度和中文字符宽度比进行判断 这个暂时写死。。
                 if (strCount + strSize > MULTIPE_LINE_CHAT_LIMIT || this._countNotChinese(tempStr) > MULTIPE_LINE_CHAT_LIMIT - 3) {
                     textRows[j].push(tempStr);
-                    console.log("row " + j + " is " + tempStr);
                     tempStr = "";
                     //换行
                     j++;
@@ -233,7 +233,6 @@ var DrawWecheatView = (function () {
                 textRows[temp] = [];
                 textRows[temp].push(tempStr);
             }
-            console.log("row is " + j);
             height = 15 + (j + 1) * 20;
             width = 18 * 20 + 15;
         }
@@ -257,7 +256,7 @@ var DrawWecheatView = (function () {
             this.context.fill();
             this.context.beginPath();
             //右边起点
-            this.context.moveTo(messageX + 10 + width, messageY + 25);
+            this.context.moveTo(messageX + 10 + width, messageY + 20);
             // 左上角
             this.context.lineTo(messageX + width, messageY + 15);
             // //左下角
@@ -271,11 +270,11 @@ var DrawWecheatView = (function () {
             if (textCount < MULTIPE_LINE_CHAT_LIMIT) {
                 //单行绘制
                 this.context.fillStyle = "#000";
-                this.context.fillText(text, messageX + 6, messageY + 35);
+                this.context.fillText(text, messageX + 6, messageY + 30);
             }
             else {
                 //多行绘制
-                var textRowX = messageX + 10, textRowY = messageY + 35;
+                var textRowX = messageX + 10, textRowY = messageY + 30;
                 for (var i = 0; i < textRows.length; i++) {
                     //多行需要分拆
                     this.context.beginPath();
@@ -301,7 +300,7 @@ var DrawWecheatView = (function () {
             this.context.fill();
             this.context.beginPath();
             //左边起点
-            this.context.moveTo(messageX - 10, messageY + 25);
+            this.context.moveTo(messageX - 10, messageY + 20);
             //右上角
             this.context.lineTo(messageX, messageY + 15);
             //右下角
@@ -315,11 +314,11 @@ var DrawWecheatView = (function () {
             if (textCount < 36) {
                 //单行绘制
                 this.context.fillStyle = "#000";
-                this.context.fillText(text, messageX + 6, messageY + 35);
+                this.context.fillText(text, messageX + 6, messageY + 30);
             }
             else {
                 //多行绘制
-                var textRowX = messageX + 10, textRowY = messageY + 35;
+                var textRowX = messageX + 10, textRowY = messageY + 30;
                 for (var i = 0; i < textRows.length; i++) {
                     //多行需要分拆
                     this.context.beginPath();
