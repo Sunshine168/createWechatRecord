@@ -70,6 +70,9 @@
     -webkit-transform: scaleY(1.0);
   }
 }
+.message_input{
+	width: 200px;
+}
 #loading{
 	top: 0;
 	left: 0;
@@ -96,7 +99,7 @@
     	 <select name="mode" id="mode" value="0">
     	 	<option value="0">普通双人</option>
     	 	<option value="1">个性独白</option>
-    	 	<option value="1">对方独白</option>
+    	 	<option value="2">对方独白</option>
     	 </select>
     </div>
     <div class="avatar">
@@ -118,7 +121,7 @@
    	   	 <option value="0">自己</option>
     	 	<option value="1">对方</option>
    	   </select>
-   	   <input type="text" id="message" value="">
+   	   <input type="text" id="message" value="" class="message_input">
    	   <input type="button" value="添加信息" id="addMessage" disabled onclick="addMessage()">
    </div>
     </div>
@@ -162,7 +165,6 @@
 		windowHeight:800
 	})  
         document.getElementById("upload").onclick = function(){
-        	 console.log("error");
           	 var avatar = document.getElementById('avatar'),
 	    	     avatar2 = document.getElementById('avatar2'),
 	    	     mode    = document.getElementById('mode').value,
@@ -196,7 +198,7 @@
 	    	     		alert("请上传对方头像")
 	    	     	}else{
 	    	     		this.disabled =true
-	    	     		uploadAvatarSelf(avatar2).then(function(){
+	    	     		uploadAvatarOther(avatar2).then(function(){
                               addMessage.disabled = false;
 	    	     		})
 	    	     	}

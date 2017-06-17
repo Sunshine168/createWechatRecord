@@ -189,18 +189,52 @@ var DrawWecheatView = (function () {
     };
     /*绘制单条信息*/
     DrawWecheatView.prototype.drewMessage = function (user, text) {
-        /* 目前信息长度与字体是写死的,后面应该可以根据设置的字体大小进行动态设置*/
+        //单行信息长度根据字体宽度设定,多行信息待定
         var avatarX, avatarY, messageX, messageY, width, height = 45, messageWidth = 100, messageHeight = 30, padding = 5, textCount = 0, row = 0, textSize;
+        var MULTIPE_LINE_CHAT_LIMIT = 36;
         //计算信息的宽度,先将中文转化一下,一个中文字符占位两个英文字符
         var chineseCount = this._countChinese(text), textCount = text.length - chineseCount + chineseCount * 2, otherCount = text.length - chineseCount;
-        if (textCount < 32) {
+        this.context.font = "20px 微软雅黑";
+        if (textCount < MULTIPE_LINE_CHAT_LIMIT) {
             //只有一行
-            width = otherCount * 13 + chineseCount * 1.8 * 13;
+            width = this.context.measureText(text).width + 10;
         }
         else {
-            row = Math.ceil(textCount / 32); //得到行数
-            height = 30 + row * 20;
-            width = 31 * 11;
+            /*
+            多行定宽处理
+            */
+            var textRows = [[]], j = 0, strCount = 0, tempStr = "";
+            //按字节截取一行可以放36字节
+            for (var i = 0; i < text.length; i++) {
+                var strSize = 0;
+                if (text.charCodeAt(i) > 128) {
+                    strSize = 2;
+                }
+                else {
+                    strSize = 1;
+                }
+                if (strCount + strSize > MULTIPE_LINE_CHAT_LIMIT) {
+                    textRows[j].push(tempStr);
+                    console.log("row " + j + " is " + tempStr);
+                    tempStr = "";
+                    //换行
+                    j++;
+                    //初始化
+                    textRows[j] = [];
+                    //清零
+                    strCount = 0;
+                }
+                tempStr += text[i];
+                strCount += strSize;
+            }
+            if (textRows[j] !== tempStr) {
+                var temp = j++;
+                textRows[temp] = [];
+                textRows[temp].push(tempStr);
+            }
+            console.log("row is " + j);
+            height = 15 + (j + 1) * 20;
+            width = 18 * 20 + 15;
         }
         /*绘制前需要判断绘制信息是否会超过整个聊天栏*/
         if (height + this.realHeight > this.backgroundHeight) {
@@ -233,21 +267,21 @@ var DrawWecheatView = (function () {
             this.context.fillStyle = "#a2e563";
             this.context.fill();
             this.context.closePath();
-            this.context.font = "20px 微软雅黑";
-            if (textCount < 32) {
+            if (textCount < MULTIPE_LINE_CHAT_LIMIT) {
                 //单行绘制
                 this.context.fillStyle = "#000";
                 this.context.fillText(text, messageX + 6, messageY + 35);
             }
             else {
                 //多行绘制
-                var textRowX = messageX + 6, textRowY = messageY + 35;
-                for (var i = 0; i < textCount; i += 32) {
-                    //
+                var textRowX = messageX + 10, textRowY = messageY + 35;
+                for (var i = 0; i < textRows.length; i++) {
+                    //多行需要分拆
                     this.context.beginPath();
                     this.context.fillStyle = "#000";
-                    this.context.fillText(text, textRowX + 6, textRowY + 35);
+                    this.context.fillText(textRows[i], textRowX, textRowY);
                     this.context.closePath();
+                    textRowY += 25;
                 }
             }
         }
@@ -277,28 +311,26 @@ var DrawWecheatView = (function () {
             this.context.fillStyle = "#fff";
             this.context.fill();
             this.context.closePath();
-            this.context.font = "20px 微软雅黑";
-            if (textCount < 32) {
+            if (textCount < 36) {
                 //单行绘制
                 this.context.fillStyle = "#000";
-                this.context.fillText(text, messageX + 10, messageY + 35);
+                this.context.fillText(text, messageX + 6, messageY + 35);
             }
             else {
                 //多行绘制
                 var textRowX = messageX + 10, textRowY = messageY + 35;
-                for (var i = 0; i < row; i++) {
-                    //
+                for (var i = 0; i < textRows.length; i++) {
+                    //多行需要分拆
                     this.context.beginPath();
                     this.context.fillStyle = "#000";
-                    var textRow = text.substring(i * 31, i * 31 + 31);
-                    this.context.fillText(textRow, textRowX, textRowY);
+                    this.context.fillText(textRows[i], textRowX, textRowY);
                     this.context.closePath();
                     textRowY += 25;
                 }
             }
         }
         // 绘制完成后需要更新实际高度
-        this.realHeight += height + 10;
+        this.realHeight += height + 15;
     };
     DrawWecheatView.prototype._debugImage = function () {
         var url = "../img/debug.png", that = this;
