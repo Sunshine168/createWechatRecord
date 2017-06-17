@@ -190,7 +190,7 @@ var DrawWecheatView = (function () {
     /*绘制单条信息*/
     DrawWecheatView.prototype.drewMessage = function (user, text) {
         //单行信息长度根据字体宽度设定,多行信息待定
-        var avatarX, avatarY, messageX, messageY, width, height = 45, messageWidth = 100, messageHeight = 30, padding = 5, textCount = 0, row = 0, textSize;
+        var avatarX, avatarY, messageX, messageY, width, height = 40, messageWidth = 100, messageHeight = 30, padding = 5, textCount = 0, row = 0, textSize;
         var MULTIPE_LINE_CHAT_LIMIT = 36;
         //计算信息的宽度,先将中文转化一下,一个中文字符占位两个英文字符
         var chineseCount = this._countChinese(text), textCount = text.length - chineseCount + chineseCount * 2, otherCount = text.length - chineseCount;
@@ -213,7 +213,8 @@ var DrawWecheatView = (function () {
                 else {
                     strSize = 1;
                 }
-                if (strCount + strSize > MULTIPE_LINE_CHAT_LIMIT) {
+                //第二个条件应该是通过计算非中文字符宽度和中文字符宽度比进行判断 这个暂时写死。。
+                if (strCount + strSize > MULTIPE_LINE_CHAT_LIMIT || this._countNotChinese(tempStr) > MULTIPE_LINE_CHAT_LIMIT - 3) {
                     textRows[j].push(tempStr);
                     console.log("row " + j + " is " + tempStr);
                     tempStr = "";
@@ -331,6 +332,7 @@ var DrawWecheatView = (function () {
         }
         // 绘制完成后需要更新实际高度
         this.realHeight += height + 15;
+        return true;
     };
     DrawWecheatView.prototype._debugImage = function () {
         var url = "../img/debug.png", that = this;
@@ -368,6 +370,10 @@ var DrawWecheatView = (function () {
     };
     DrawWecheatView.prototype._countChinese = function (str) {
         var m = str.match(/[\u4e00-\u9fff\uf900-\ufaff]/g);
+        return (!m ? 0 : m.length);
+    };
+    DrawWecheatView.prototype._countNotChinese = function (str) {
+        var m = str.match(/(?![\u4e00-\u9fff\uf900-\ufaff])/g);
         return (!m ? 0 : m.length);
     };
     //设置状态图片接口(null则是直接清空)

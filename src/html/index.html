@@ -164,7 +164,7 @@
 		windowWidth:500,
 		windowHeight:800
 	})  
-        document.getElementById("upload").onclick = function(){
+        document.getElementById("upload").onclick = function(){	
           	 var avatar = document.getElementById('avatar'),
 	    	     avatar2 = document.getElementById('avatar2'),
 	    	     mode    = document.getElementById('mode').value,
@@ -247,7 +247,10 @@
 	    	     if(message===""){
 	    	     	alert("信息不能为空")
 	    	     }else{
-	    	     	drawWecheatView.drewMessage(talkerType,message)
+	    	     	var result = drawWecheatView.drewMessage(talkerType,message)
+	    	     	  if(!result){
+	    	     	  	  alert("高度不足 请等待更新");
+	    	     	  }
 	    	     }
 	    }
 	    function setName(){
