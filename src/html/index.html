@@ -103,7 +103,7 @@
     	 </select>
     </div>
     <div class="avatar">
-      <h4>上传头像</h4> <input type="text" id="talkerName">  <input type="button" value="输入名字" onclick="setName()" id="setName">
+      <h4>上传头像</h4> <input type="text" id="talkerName">  <input type="button" value="输入名字"  id="setName">
    	  <div class="avatar-item">
    	     <h5>本人头像</h5>
    	  	 <input type="file" id="avatar"> 
@@ -122,10 +122,10 @@
     	 	<option value="1">对方</option>
    	   </select>
    	   <input type="text" id="message" value="" class="message_input">
-   	   <input type="button" value="添加信息" id="addMessage" disabled onclick="addMessage()">
+   	   <input type="button" value="添加信息" id="addMessage" disabled >
    </div>
    <div class="download">
-   	  <input type="button" id="process" value="下载图片" onclick="download()">
+   	  <input type="button" id="process" value="下载图片">
    </div>
     </div>
 <div id="loading">
@@ -138,154 +138,8 @@
 </div>
 </div>
 </div>
-<script src="../js/index.js"></script>
+<!-- <script src="../js/index.js"></script> -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/javascript-canvas-to-blob/3.8.0/js/canvas-to-blob.min.js"></script>
-<script>
-       var canvas,context,drawWecheatView,isInit,avatar,list = [
-       {
-       	user:0,
-       	message:"hello"
-       },
-        {
-       	user:1,
-       	message:"hello1"
-       },
-        {
-       	user:1,
-       	message:"hello2"
-       },
-       ]
-         canvas = document.getElementById("canvas");
-        canvas.width = 500;
-        canvas.height = 800;
-        context = canvas.getContext("2d");
-        drawWecheatView = new DrawWecheatView({
-		mode:0,
-		platform:0,
-		x:0,
-		y:0,
-		context:context,
-		windowWidth:500,
-		windowHeight:800
-	})  
-        document.getElementById("upload").onclick = function(){	
-          	 var avatar = document.getElementById('avatar'),
-	    	     avatar2 = document.getElementById('avatar2'),
-	    	     mode    = document.getElementById('mode').value,
-	    	     addMessage = document.getElementById('addMessage');
-	    	     mode = Number(mode);
-	    	     if(mode==0){
-	    	     	//双方头像必须上传
-	    	     	if(!avatar.files[0]||!avatar2.files[0]){
-	    	     		alert("请上传双方头像");
-	    	     	}else{
-	    	     		this.disabled =true
-	    	     		uploadAvatarBoth(avatar,avatar2).then(function(){
-                              addMessage.disabled = false;
-	    	     		})
-	    	     	}
-	    	     }
-	    	     if(mode==1){
-	    	        //自己头像必须上传
-	    	        if(!avatar.files[0]){
-	    	     		alert("请上传自己头像")
-	    	     	}else{
-	    	     		this.disabled =true
-	    	     		uploadAvatarSelf(avatar).then(function(result){
-                              addMessage.disabled = false;
-	    	     		})
-	    	     	}
-	    	     }
-	    	      if(mode==2){
-	    	        //对方头像必须上传
-	    	         if(!avatar2.files[0]){
-	    	     		alert("请上传对方头像")
-	    	     	}else{
-	    	     		this.disabled =true
-	    	     		uploadAvatarOther(avatar2).then(function(){
-                              addMessage.disabled = false;
-	    	     		})
-	    	     	}
-	    	     }
-
-        }
-	    checkInit(function(){
-	    	document.getElementById('loading').style.display="none";
-	    }) 
-	    drawWecheatView.initView()
-	    .then(function(){
-	    	isInit =  true;
-	    	return drawWecheatView.setBarkground({color:"#f3f3f3"})
-	    })
-	    function checkInit(success,fail){
-	    	var timer = setInterval(function(){
-                    if(isInit){
-                    	clearInterval(timer);
-                    	clearInterval(timeOuter);
-                    	console.log("初始化成功")//
-                    	success()
-                    }
-	    	},500);
-	    	var timeOuter = setTimeout(function(){
-	    		    if(!isInit){
-	    		    	alert("初始化失败")
-	    		    }
-	    	},50000);
-	    }
-	    function uploadAvatarBoth(avatar,avatar2){
-	    	     	var p1 = drawWecheatView.setAvatar(0,avatar.files[0])
-	    	     	var p2 = drawWecheatView.setAvatar(1,avatar2.files[0])
-	    	     return Promise.all([p1,p2]);
-
-	    }
-	    function uploadAvatarSelf(avatar){
-	    	return drawWecheatView.setAvatar(0,avatar.files[0])
-	    }
-	    function uploadAvatarOther(avatar){
-	    	return drawWecheatView.setAvatar(1,avatar.files[0])
-	    }
-	    function addMessage(){
-	    	 var talkerType =  document.getElementById('talkerType').value,
-	    	     message =  document.getElementById('message').value;
-	    	     talkerType = Number(talkerType);
-	    	     if(message===""){
-	    	     	alert("信息不能为空")
-	    	     }else{
-	    	     	var result = drawWecheatView.drewMessage(talkerType,message)
-	    	     	  if(!result){
-	    	     	  	  alert("高度不足 请等待更新");
-	    	     	  }
-	    	     }
-	    }
-	    function setName(){
-            var name = document.getElementById("talkerName").value;
-            drawWecheatView.setTalkerName(name);
-            document.getElementById("setName").disabled = true;
-	    }
-	    function download(){
-	    	if (canvas.toBlob) {
-                canvas.toBlob(
-        function (blob) {
-           createAndDownloadFile("record.png",blob)
-        },
-        'image/jpeg'
-    );
-	    }
-	}
-/**
-https://gaohaoyang.github.io/2016/11/22/js-create-file-and-download/
- * 创建并下载文件
- * @param  {String} fileName 文件名
- * @param  {String} content  文件内容
- */
-function createAndDownloadFile(fileName, content) {
-    var aTag = document.createElement('a');
-    var blob = new Blob([content]);
-    aTag.download = fileName;
-    aTag.href = URL.createObjectURL(blob);
-    aTag.click();
-    URL.revokeObjectURL(blob);
-}
-</script>
+<script src="../bundle.js"></script>
 </body>
 </html>

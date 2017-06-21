@@ -8,6 +8,7 @@ var watchify = require("watchify");
 var buffer = require('vinyl-buffer');
 var gutil = require("gulp-util");
 var ts = require("gulp-typescript");
+var babel = require('gulp-babel');
 var paths = {
 	pages: ['src/html/*.html'],
 };
@@ -28,6 +29,10 @@ gulp.task("build", ["copy-html"], function() {
 		})
 		.plugin(tsify)
 		.bundle()
+		.transform('babelify', {
+			presets: ['es2015'],
+			extensions: ['.ts']
+		})
 		.pipe(source('bundle.js'))
 		.pipe(buffer())
 		.pipe(sourcemaps.init({
@@ -59,7 +64,8 @@ function bundle() {
 gulp.task("complier", ["copy-html", 'watchjs', 'watchHtml'], function() {
 	return tsProject.src()
 		.pipe(tsProject())
-		.js.pipe(gulp.dest("dist/js"));
+		.pipe(babel())
+		.pipe(gulp.dest("dist/js"));
 });
 
 gulp.task('watchHtml', function() {
@@ -96,9 +102,32 @@ gulp.task('watchjs', function() {
 		gutil.log('Dist ' + paths.distPath)
 		gulp.src(paths.srcPath)
 			.pipe(tsProject())
+			.pipe(babel())
 			.pipe(gulp.dest(paths.distDir))
 	})
 })
 
+gulp.task('test', ['copy-html'], function() {
+	return browserify({
+			basedir: '.',
+			debug: true,
+			entries: ['src/index.ts'],
+			cache: {},
+			packageCache: {}
+		})
+		.plugin(tsify)
+	// .transform('babelify', {
+	// 	presets: ['es2015'],
+	// 	extensions: ['.ts']
+	// })
+		.bundle()
+		.pipe(source('bundle.js'))
+		.pipe(buffer())
+		.pipe(sourcemaps.init({
+			loadMaps: true
+		}))
+		.pipe(sourcemaps.write('./'))
+		.pipe(gulp.dest('dist'));
+});
 
 gulp.task("autoComplier", ["watchjs"]);
