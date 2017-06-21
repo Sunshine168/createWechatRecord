@@ -1,5 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+
 exports.__esModule = true;
 // var Promise :any;
 /*
@@ -7,7 +8,9 @@ promise异步通过fileReader加载图片,成功后返回该图片
 */
 function promiseFileReaderLoadImage(file) {
     return new Promise(function (resolve, reject) {
-        var reader = new FileReader(), image = new Image(), url;
+        var reader = new FileReader(),
+            image = new Image(),
+            url;
         reader.onload = function (e) {
             url = e.target.result;
             image.onload = function () {
@@ -30,7 +33,7 @@ function promiseLoadImage(url) {
         image.src = url;
     });
 }
-var DrawWecheatView = (function () {
+var DrawWecheatView = function () {
     function DrawWecheatView(opts) {
         this.opts = {
             mode: opts.mode,
@@ -66,13 +69,13 @@ var DrawWecheatView = (function () {
      通过异步链确定加载完成
     */
     DrawWecheatView.prototype.setAvatar = function (target, avatar) {
-        var fileReader = promiseFileReaderLoadImage(avatar), that = this;
+        var fileReader = promiseFileReaderLoadImage(avatar),
+            that = this;
         return new Promise(function (resolve, reject) {
             fileReader.then(function (result) {
                 if (target === 0) {
                     that.avatar = result;
-                }
-                else {
+                } else {
                     that.avatar2 = result;
                 }
                 resolve();
@@ -86,23 +89,24 @@ var DrawWecheatView = (function () {
         this.dialogueList = list;
     };
     DrawWecheatView.prototype._drawDialogueView = function () {
-        this._checkStatus().then(function () {
-        })["catch"](function (e) { return function () {
-        }; });
+        this._checkStatus().then(function () {})["catch"](function (e) {
+            return function () {};
+        });
     };
     /*
      初始化顶部栏和状态栏并绘制
     */
     DrawWecheatView.prototype.initView = function () {
         /*IOS加载*/
-        var srcURL = "", that = this;
+        var srcURL = "",
+            that = this;
         if (this.opts.platform === 0) {
             /*目前图片写死,后面再修改成活动的*/
             srcURL = "../img/";
-        }
-        else {
-        }
-        var statusImage = promiseLoadImage(srcURL + "status.png"), talkerImage = promiseLoadImage(srcURL + "talker.png"), inputImage = promiseLoadImage(srcURL + "input.png");
+        } else {}
+        var statusImage = promiseLoadImage(srcURL + "status.png"),
+            talkerImage = promiseLoadImage(srcURL + "talker.png"),
+            inputImage = promiseLoadImage(srcURL + "input.png");
         return new Promise(function (resolve, reject) {
             Promise.all([statusImage, talkerImage, inputImage]).then(function (result) {
                 that.statusImage = result[0];
@@ -127,7 +131,11 @@ var DrawWecheatView = (function () {
         return promiseFileReaderLoadImage(this.opts.background);
     };
     DrawWecheatView.prototype.setBarkground = function (opts) {
-        var that = this, backgroundX = this.opts.x, backgroundY = this.defaultInitViewOptions.statusHeight + this.defaultInitViewOptions.talkerHeight, backgroundWidth = this.defaultInitViewOptions.windowWidth, backgroundHeight = this.defaultInitViewOptions.windowHeight - this.defaultInitViewOptions.statusHeight - this.defaultInitViewOptions.talkerHeight - this.defaultInitViewOptions.inputHeight;
+        var that = this,
+            backgroundX = this.opts.x,
+            backgroundY = this.defaultInitViewOptions.statusHeight + this.defaultInitViewOptions.talkerHeight,
+            backgroundWidth = this.defaultInitViewOptions.windowWidth,
+            backgroundHeight = this.defaultInitViewOptions.windowHeight - this.defaultInitViewOptions.statusHeight - this.defaultInitViewOptions.talkerHeight - this.defaultInitViewOptions.inputHeight;
         //存储下来计算所得的背景高度
         this.backgroundHeight = backgroundHeight;
         return new Promise(function (resolve, reject) {
@@ -136,8 +144,7 @@ var DrawWecheatView = (function () {
                 that.context.fillStyle = opts.color;
                 that.context.fillRect(backgroundX, backgroundY, backgroundWidth, backgroundHeight);
                 resolve();
-            }
-            else {
+            } else {
                 //加装图片并绘制
             }
         });
@@ -155,8 +162,7 @@ var DrawWecheatView = (function () {
                     if (this.avatar) {
                         resolve();
                     }
-                }
-                else {
+                } else {
                     if (this.avatar && this.avatar2) {
                         resolve();
                     }
@@ -168,32 +174,48 @@ var DrawWecheatView = (function () {
     /*绘制单条信息*/
     DrawWecheatView.prototype.drewMessage = function (user, text) {
         //单行信息长度根据字体宽度设定,多行信息待定
-        var avatarX, avatarY, messageX, messageY, width, height = 35, messageWidth = 100, messageHeight = 30, padding = 5, textCount = 0, row = 0, textSize, textRows;
+        var avatarX,
+            avatarY,
+            messageX,
+            messageY,
+            width,
+            height = 35,
+            messageWidth = 100,
+            messageHeight = 30,
+            padding = 5,
+            textCount = 0,
+            row = 0,
+            textSize,
+            textRows;
         /*三角参数*/
-        var TRIANGLE_PADDING_START_X = 10, TRIANGLE_PADDING_START_Y = 20, TRIANGLE_PADDING_TOP_Y = 15, TRIANGLE_PADDING_DOWN_Y = 25;
+        var TRIANGLE_PADDING_START_X = 10,
+            TRIANGLE_PADDING_START_Y = 20,
+            TRIANGLE_PADDING_TOP_Y = 15,
+            TRIANGLE_PADDING_DOWN_Y = 25;
         //多行字数限制
         var MULTIPE_LINE_CHAT_LIMIT = 40;
         //计算信息的宽度,先将中文转化一下,一个中文字符占位两个英文字符
-        var chineseCount = this._countChinese(text), otherCount = text.length - chineseCount;
+        var chineseCount = this._countChinese(text),
+            otherCount = text.length - chineseCount;
         this.context.font = "18px 微软雅黑";
         textCount = text.length - chineseCount + chineseCount * 2;
         if (textCount < MULTIPE_LINE_CHAT_LIMIT) {
             //只有一行
             width = this.context.measureText(text).width + 12;
-        }
-        else {
+        } else {
             /*
             多行定宽处理
             */
-            var j = 0, strCount = 0, tempStr = "";
+            var j = 0,
+                strCount = 0,
+                tempStr = "";
             textRows[j] = "";
             //按字节截取一行可以放36字节
             for (var i = 0; i < text.length; i++) {
                 var strSize = 0;
                 if (text.charCodeAt(i) > 128) {
                     strSize = 2;
-                }
-                else {
+                } else {
                     strSize = 1;
                 }
                 //第二个条件应该是通过计算非中文字符宽度和中文字符宽度比进行判断 这个暂时写死。。
@@ -253,10 +275,10 @@ var DrawWecheatView = (function () {
                 //单行绘制
                 this.context.fillStyle = "#000";
                 this.context.fillText(text, messageX + 6, messageY + 30);
-            }
-            else {
+            } else {
                 //多行绘制
-                var textRowX = messageX + 10, textRowY = messageY + 30;
+                var textRowX = messageX + 10,
+                    textRowY = messageY + 30;
                 for (var i = 0; i < textRows.length; i++) {
                     //多行需要分拆
                     this.context.beginPath();
@@ -266,8 +288,7 @@ var DrawWecheatView = (function () {
                     textRowY += 25;
                 }
             }
-        }
-        else {
+        } else {
             //左边为对话者
             //先计算头像的起点,信息的起点,使用默认的左右间距后为起点
             avatarX = padding;
@@ -297,10 +318,10 @@ var DrawWecheatView = (function () {
                 //单行绘制
                 this.context.fillStyle = "#000";
                 this.context.fillText(text, messageX + 6, messageY + 30);
-            }
-            else {
+            } else {
                 //多行绘制
-                var textRowX = messageX + 10, textRowY = messageY + 30;
+                var textRowX = messageX + 10,
+                    textRowY = messageY + 30;
                 for (var i = 0; i < textRows.length; i++) {
                     //多行需要分拆
                     this.context.beginPath();
@@ -316,7 +337,8 @@ var DrawWecheatView = (function () {
         return true;
     };
     DrawWecheatView.prototype._debugImage = function () {
-        var url = "../img/debug.png", that = this;
+        var url = "../img/debug.png",
+            that = this;
         return new Promise(function (resolve) {
             promiseLoadImage(url).then(function (result) {
                 that.avatar = result;
@@ -342,7 +364,8 @@ var DrawWecheatView = (function () {
         if (name.length > 20 || name.length == 0) {
             return false;
         }
-        var nameY = this.defaultInitViewOptions.statusHeight + 25, nameX = this.defaultInitViewOptions.windowWidth / 2 - (name.length * 8) / 2;
+        var nameY = this.defaultInitViewOptions.statusHeight + 25,
+            nameX = this.defaultInitViewOptions.windowWidth / 2 - name.length * 8 / 2;
         this.context.beginPath();
         this.context.fillStyle = "#fff";
         this.context.font = "22px 微软雅黑";
@@ -351,11 +374,11 @@ var DrawWecheatView = (function () {
     };
     DrawWecheatView.prototype._countChinese = function (str) {
         var m = str.match(/[\u4e00-\u9fff\uf900-\ufaff]/g);
-        return (!m ? 0 : m.length);
+        return !m ? 0 : m.length;
     };
     DrawWecheatView.prototype._countNotChinese = function (str) {
         var m = str.match(/(?![\u4e00-\u9fff\uf900-\ufaff])/g);
-        return (!m ? 0 : m.length);
+        return !m ? 0 : m.length;
     };
     //设置状态图片接口(null则是直接清空)
     DrawWecheatView.prototype.setStatusImage = function (statusImage) {
@@ -372,28 +395,30 @@ var DrawWecheatView = (function () {
         return this.talkerImage;
     };
     return DrawWecheatView;
-}());
+}();
 exports.DrawWecheatView = DrawWecheatView;
 
 },{}],2:[function(require,module,exports){
 "use strict";
+
 exports.__esModule = true;
 var DrawView_1 = require("./DrawView");
 (function () {
-    var canvas, context, drawWecheatView, isInit, avatar, list = [
-        {
-            user: 0,
-            message: "hello"
-        },
-        {
-            user: 1,
-            message: "hello1"
-        },
-        {
-            user: 1,
-            message: "hello2"
-        },
-    ];
+    var canvas,
+        context,
+        drawWecheatView,
+        isInit,
+        avatar,
+        list = [{
+        user: 0,
+        message: "hello"
+    }, {
+        user: 1,
+        message: "hello1"
+    }, {
+        user: 1,
+        message: "hello2"
+    }];
     canvas = document.getElementById("canvas");
     canvas.width = 500;
     canvas.height = 800;
@@ -417,14 +442,16 @@ var DrawView_1 = require("./DrawView");
         download();
     };
     document.getElementById("upload").onclick = function () {
-        var avatar = document.getElementById('avatar'), avatar2 = document.getElementById('avatar2'), mode = Number(document.getElementById('mode').value), addMessage = document.getElementById('addMessage');
+        var avatar = document.getElementById('avatar'),
+            avatar2 = document.getElementById('avatar2'),
+            mode = Number(document.getElementById('mode').value),
+            addMessage = document.getElementById('addMessage');
         var element = this;
         if (mode === 0) {
             //双方头像必须上传
             if (!avatar.files[0] || !avatar2.files[0]) {
                 alert("请上传双方头像");
-            }
-            else {
+            } else {
                 element.disabled = true;
                 uploadAvatarBoth(avatar, avatar2).then(function () {
                     addMessage.disabled = false;
@@ -435,8 +462,7 @@ var DrawView_1 = require("./DrawView");
             //自己头像必须上传
             if (!avatar.files[0]) {
                 alert("请上传自己头像");
-            }
-            else {
+            } else {
                 element.disabled = true;
                 uploadAvatarSelf(avatar).then(function (result) {
                     addMessage.disabled = false;
@@ -447,8 +473,7 @@ var DrawView_1 = require("./DrawView");
             //对方头像必须上传
             if (!avatar2.files[0]) {
                 alert("请上传对方头像");
-            }
-            else {
+            } else {
                 element.disabled = true;
                 uploadAvatarOther(avatar2).then(function () {
                     addMessage.disabled = false;
@@ -460,8 +485,7 @@ var DrawView_1 = require("./DrawView");
         document.getElementById('loading').style.display = "none";
     });
     /*init*/
-    drawWecheatView.initView()
-        .then(function () {
+    drawWecheatView.initView().then(function () {
         isInit = true;
         return drawWecheatView.setBarkground({ color: "#f3f3f3" });
     });
@@ -492,11 +516,11 @@ var DrawView_1 = require("./DrawView");
         return drawWecheatView.setAvatar(1, avatar.files[0]);
     }
     function addMessage() {
-        var talkerType = Number(document.getElementById('talkerType').value), message = document.getElementById('message').value;
+        var talkerType = Number(document.getElementById('talkerType').value),
+            message = document.getElementById('message').value;
         if (message === "") {
             alert("信息不能为空");
-        }
-        else {
+        } else {
             var result = drawWecheatView.drewMessage(talkerType, message);
             if (!result) {
                 alert("高度不足 请等待更新");
